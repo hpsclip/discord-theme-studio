@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Discord Theme Studio</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT PANEL */
+#controls {
+  width: 260px;
+  padding: 10px;
+  background: #111;
+  color: white;
+}
+
+input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* FAKE DISCORD */
+#preview {
+  flex: 1;
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 80px;
+  background: var(--sidebar);
+}
+
+/* CHANNEL LIST */
+.channels {
+  width: 200px;
+  background: var(--channels);
+}
+
+/* CHAT */
+.chat {
+  flex: 1;
+  background: var(--chat);
+  color: var(--text);
+  padding: 10px;
+}
+
+/* MESSAGE */
+.msg {
+  margin-bottom: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="controls">
+  <h3>Theme</h3>
+
+  <label>Sidebar</label>
+  <input type="color" id="sidebar">
+
+  <label>Channels</label>
+  <input type="color" id="channels">
+
+  <label>Chat</label>
+  <input type="color" id="chat">
+
+  <label>Text</label>
+  <input type="color" id="text">
+
+  <button onclick="applyTheme()">Apply</button>
+  <button onclick="copyLink()">Share</button>
+</div>
+
+<div id="preview">
+  <div class="sidebar"></div>
+  <div class="channels"></div>
+  <div class="chat">
+    <div class="msg"><b>User1:</b> yo this looks clean</div>
+    <div class="msg"><b>User2:</b> this is actually fire</div>
+    <div class="msg"><b>You:</b> made this myself</div>
+  </div>
+</div>
+
+<script>
+const defaults = {
+  sidebar: "#202225",
+  channels: "#2f3136",
+  chat: "#36393f",
+  text: "#ffffff"
+};
+
+function applyTheme() {
+  const theme = {
+    sidebar: sidebar.value,
+    channels: channels.value,
+    chat: chat.value,
+    text: text.value
+  };
+
+  document.documentElement.style.setProperty('--sidebar', theme.sidebar);
+  document.documentElement.style.setProperty('--channels', theme.channels);
+  document.documentElement.style.setProperty('--chat', theme.chat);
+  document.documentElement.style.setProperty('--text', theme.text);
+
+  localStorage.setItem("theme", JSON.stringify(theme));
+}
+
+function loadTheme() {
+  const saved = JSON.parse(localStorage.getItem("theme")) || defaults;
+
+  sidebar.value = saved.sidebar;
+  channels.value = saved.channels;
+  chat.value = saved.chat;
+  text.value = saved.text;
+
+  applyTheme();
+}
+
+function copyLink() {
+  const theme = {
+    s: sidebar.value,
+    c: channels.value,
+    ch: chat.value,
+    t: text.value
+  };
+
+  const url = location.origin + location.pathname +
+    `?s=${theme.s}&c=${theme.c}&ch=${theme.ch}&t=${theme.t}`;
+
+  navigator.clipboard.writeText(url);
+  alert("Link copied!");
+}
+
+function loadFromURL() {
+  const params = new URLSearchParams(location.search);
+
+  if (params.has("s")) {
+    sidebar.value = params.get("s");
+    channels.value = params.get("c");
+    chat.value = params.get("ch");
+    text.value = params.get("t");
+
+    applyTheme();
+  }
+}
+
+loadTheme();
+loadFromURL();
+</script>
+
+</body>
+</html>
